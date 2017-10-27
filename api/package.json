@@ -1,0 +1,19 @@
+{
+  "name": "server_instagram",
+  "version": "1.0.0",
+  "description": "Server",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon"
+  },
+  "author": "Ricardo Rinco",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "mongodb": "^2.2.31"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
