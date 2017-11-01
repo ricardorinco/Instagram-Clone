@@ -18,6 +18,36 @@
 	<script>
 		$(document).ready(function () {
 
+			function carregarPostagens() {
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', 'http://localhost:3000/api');
+
+				xhr.onload = function () {
+					if (xhr.status === 200) {
+						var data = JSON.parse(xhr.responseText);
+						console.log(data);
+						
+						for (i = 0; i < data.length; i++) {
+							console.log(data[i].titulo)
+							console.log(data[i].url_image)
+
+							$('#container_timeline').append(
+								`<div class='publicacao'>
+									<span class='titulo'>
+										${data[i].titulo}
+									</span>
+									<img src='http://localhost:3000/imagens/${data[i].url_image}' />
+								</div>`
+							);
+						}
+					}
+				};
+
+				xhr.send();
+			};
+
+			carregarPostagens();
+
 			$('#btn_incluir').click(function () {
 				$('#container_timeline').hide();
 				$('#container_form').show();
@@ -40,13 +70,13 @@
 
 				// Criação do XMLHttpRequest
 				var xhr = new XMLHttpRequest();
-				
-				// Verificação da mudança de estado
-				xhr.onreadystatechange = function() {
-					// xhr.readyState
-					var resposta = xhr.responseText;
 
-					document.getElementById('mensagem').innerHTML = resposta;
+				// Verificação da mudança de estado
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState == 4) {
+						var resposta = xhr.responseText;
+						document.getElementById('mensagem').innerHTML = resposta;
+					}
 				};
 
 				xhr.open('POST', 'http://localhost:3000/api');
