@@ -60,6 +60,8 @@ app.get('/api/:id', function (req, res) {
 
 // Post
 app.post('/api', function (req, res) {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:1080');
+    
     var dados = req.body;
 
     database.open(function (err, mongoClient) {
