@@ -3,21 +3,17 @@
 
 <head>
 	<meta charset="UTF-8">
-
 	<title>Instagram Clone - WEB</title>
 
 	<!-- JQuery -->
 	<script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
-
-	<!-- bootstrap - link cdn -->
+	<!-- Bootstrap -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-
-	<!-- incluindo css -->
+	<!-- CSS -->
 	<link href="css/style.css" rel="stylesheet">
 
 	<script>
 		$(document).ready(function () {
-
 			function carregarPostagens() {
 				var xhr = new XMLHttpRequest();
 				xhr.open('GET', 'http://localhost:3000/api');
@@ -25,21 +21,70 @@
 				xhr.onload = function () {
 					if (xhr.status === 200) {
 						var data = JSON.parse(xhr.responseText);
-						console.log(data);
-						
-						for (i = 0; i < data.length; i++) {
-							console.log(data[i].titulo)
-							console.log(data[i].url_image)
 
+						for (i = 0; i < data.length; i++) {
 							$('#container_timeline').append(
 								`<div class='publicacao'>
 									<span class='titulo'>
 										${data[i].titulo}
 									</span>
-									<img src='http://localhost:3000/imagens/${data[i].url_image}' />
+									<img src='http://localhost:3000/imagens/${data[i].url_image}' class="img-responsive" />
+									<div id='comentarios_${data[i]._id}' class='comentarios'></div>
+									<div class='comentar'>
+										<input type='text' class='form-control input_comentario' id='p${data[i]._id}' placeholder='Adicione o seu comentário...'>
+										<button class='btn btn-default btn_postagem' value='${data[i]._id}' type='button'>Comentar</button>
+									</div>
 								</div>`
 							);
+
+							if (data[i].comentarios != undefined) {
+								var comentarios = data[i].comentarios;
+
+								for (j = 0; j < comentarios.length; j++) {
+									$(`#comentarios_${data[i]._id}`).append(
+										`<div class='txt_comentario'>
+											<button type='button' class='btn btn-default btn_remover_postagem' value='${comentarios[j].id_comentario}'>
+												<span class="glyphicon glyphicon-trash"></span>
+											</button>
+											${comentarios[j].comentario}
+										</div>
+										`);
+								}
+							}
 						}
+
+						$('.btn_postagem').click(function () {
+							var id = this.value;
+							var id_input_comentario = `p${id}`;
+							var comentario = $(`#${id_input_comentario}`).val();
+
+							var xhr = new XMLHttpRequest();
+							xhr.open('PUT', `http://localhost:3000/api/${id}`);
+							xhr.setRequestHeader('content-type', 'application/json');
+
+							xhr.onload = function () {
+								if (xhr.status === 200) {
+									window.location.href = '/home';
+								}
+							};
+
+							xhr.send(JSON.stringify({ comentario: `${comentario}` }));
+						});
+
+						$('.btn_remover_postagem').click(function () {
+							var id_comentario = this.value;
+							
+							var xhr = new XMLHttpRequest();
+							xhr.open('DELETE', `http://localhost:3000/api/${id_comentario}`);
+
+							xhr.onload = function () {
+								if (xhr.status === 200) {
+									window.location.href = '/home';
+								}
+							};
+
+							xhr.send();
+						});
 					}
 				};
 
@@ -85,11 +130,9 @@
 
 		});
 	</script>
-
 </head>
 
 <body>
-
 	<nav class="navbar navbar-default">
 		<div class="container">
 			<div class="col-md-12">
@@ -100,30 +143,22 @@
 			</div>
 		</div>
 	</nav>
-
 	<div class="container">
 		<div class="col-md-2"></div>
 		<div class="col-md-8" id="container_timeline"></div>
-
 	</div>
-
-
 	<div class="container" style="display:none" id="container_form">
 		<div class="panel panel-default">
-
 			<div class="panel-heading">
 				<h4>Publicar uma foto</h4>
 			</div>
-
 			<div class="panel-body">
 				<div class="form-group">
 					<input type="file" name="arquivo" id="arquivo" class="form-control">
 				</div>
-
 				<div class="form-group">
 					<input type="text" name="titulo" id="titulo" class="form-control" placeholder="Titulo" autocomplete="off">
 				</div>
-
 				<div class="form-group">
 					<button class="btn btn-success" id="btn-publicar">Publicar</button>
 					<button class="btn btn-danger" id="btn-cancelar-publicacao">Cancelar</button>
